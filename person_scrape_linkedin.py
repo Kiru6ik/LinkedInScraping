@@ -1,98 +1,101 @@
-import csv
-from selenium import webdriver
-from linkedin_scraper import Person, actions, Company
-from selenium.webdriver.chrome.service import Service as ChromeService
-from webdriver_manager.chrome import ChromeDriverManager
-import time, pickle
-from selenium.webdriver.chrome.options import Options
-from selenium.common.exceptions import WebDriverException
+# Importing necessary tools for our program.
+
+import csv  # Helps us work with files that have rows and columns, like a spreadsheet.
+from selenium import webdriver  # A tool that lets our program use a web browser, just like when you go on the internet.
+from linkedin_scraper import Person, actions, Company  # Special tools to grab info from LinkedIn, a website for job professionals.
+from selenium.webdriver.chrome.service import Service as ChromeService  # This helps us set up and control the Chrome browser.
+from webdriver_manager.chrome import ChromeDriverManager  # Helps us get the latest version of the Chrome browser.
+import time, pickle  # 'time' lets us pause our program, 'pickle' lets us save and load data easily.
+from selenium.webdriver.chrome.options import Options  # Gives us extra settings for the Chrome browser.
+from selenium.common.exceptions import WebDriverException  # Helps us deal with browser-related errors.
 
 def person_scrape(link, driver):
-    person = Person(link, driver=driver, scrape=False)
-    time.sleep(10)
-    person.scrape(close_on_complete=False)
-
+    # Grab details about a person from LinkedIn.
+    
+    person = Person(link, driver=driver, scrape=False)  # Prepare to get person's details.
+    time.sleep(10)  # Wait for 10 seconds. Sometimes we wait so websites don't get mad at us.
+    person.scrape(close_on_complete=False)  # Now, get the person's details.
+    
+    # Store the information we found in different boxes (or variables).
     name = person.name
     title = person.job_title
     now_company = person.company
-
     experience = person.experiences
     current_company = experience[0]
     link_to_company = current_company.linkedin_url
     location = current_company.location
     about_person=person.about
-    time.sleep(7)
-    # company = Company(link_to_company, driver=driver, close_on_complete=False, get_employees=False)
-    # company_size = company.company_size
-    # company_website = company.website
-    # about_company = company.about_us
-
-    list=[name, title, about_person, now_company, link_to_company, location] #, company_size, company_website, about_company, location]
-    # print(list)
+    
+    time.sleep(7)  # Another short wait.
+    
+    company = Company(link_to_company, driver=driver, close_on_complete=False, get_employees=False)  # Prepare to get company's details.
+    company_size = company.company_size
+    company_website = company.website
+    about_company = company.about_us
+    
+    list=[name, title, about_person, now_company, link_to_company, location]  # Pack the details we got into a list.
     return list
 
 def company_scrape(link_to_company, driver):
-    company = Company(link_to_company, driver=driver, close_on_complete=False)
+    # Grab details about a company from LinkedIn.
+    
+    company = Company(link_to_company, driver=driver, close_on_complete=False)  # Prepare to get company's details.
     company_size = company.company_size
     company_website = company.website
     about = company.about_us
-    list=[company_size, company_website, about]
-    # print(company_size, company_website, about)
+    
+    list=[company_size, company_website, about]  # Pack the details we got into a list.
     return list
 
 options = Options()
-options.add_argument("user-data-dir=C:\\Users\\User\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 3")
+options.add_argument("user-data-dir=C:\\Users\\User\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 3")  # Special settings for our browser.
 
-new_data=[]
-driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
+new_data=[]  # An empty box to keep the details we find.
+driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)  # Start our browser.
 
-#update to include normail formatting, now it saves all the rows
+# Reading a file with lots of LinkedIn profiles and gathering their details.
 i=0
 with open(r'C:\Users\User\Downloads\Telegram Desktop\consulting_profiles1(1-103).csv', 'r', encoding='utf8') as file:
-    reader=csv.reader(file)
-    data=list(reader)
-    data=['https://www.linkedin.com/in/talhia-pompa-13638260?miniProfileUrn=urn%3Ali%3Afs_miniProfile%3AACoAAAzeejoBwfuJXCp875koUrs8mSl-Jw-w6yI&lipi=urn%3Ali%3Apage%3Ad_flagship3_search_srp_people%3BxQ%2Bu%2B27sR%2Fy3lGGq7Fae6Q%3D%3D', 'https://www.linkedin.com/in/arielmeagher/ https://www.linkedin.com/in/tammy-connelly-3a428013/', 'https://www.linkedin.com/in/ferzeen-najfi-69776a8/', 'https://www.linkedin.com/in/bharti-dhar-9bb8a9109/', 'https://www.linkedin.com/in/anilpuli/', 'https://www.linkedin.com/in/adeelawaller/', 'https://www.linkedin.com/in/adeelawaller/',
-'https://www.linkedin.com/in/jennifer-moceri-a825032, https://www.linkedin.com/in/fiona-clare-cicconi-304249/',  'https://www.linkedin.com/in/gluke?miniProfileUrn=urn%3Ali%3Afs_miniProfile%3AACoAABas124BVip_eZiyR6JCi0oeWeFB0SL-lAg&lipi=urn%3Ali%3Apage%3Ad_flagship3_search_srp_people%3BT0ILf5XBTquJrGBhjnkeKw%3D%3D',
-'https://www.linkedin.com/in/carol-surface/', 'https://www.linkedin.com/in/jennifertylau/',' https://www.linkedin.com/in/christamumman/','  https://www.linkedin.com/in/divya-ejjigani-5bab7555/ ','https://www.linkedin.com/in/jeremyyjones/',
-'https://www.linkedin.com/in/kathleenthogan/',   'https://www.linkedin.com/in/kamaraswaby/',' https://www.linkedin.com/in/vicannia-merisma-ba632934/','  https://www.linkedin.com/in/chioma-acholonu/',' https://www.linkedin.com/in/bethteigue/',  'https://www.linkedin.com/in/jerilynsamuel/', 'https://www.linkedin.com/in/brookesimpson/',
-'https://www.linkedin.com/in/nickle-lamoreaux/',   'https://www.linkedin.com/in/seema-balani-68876b121/',' https://www.linkedin.com/in/jill-bunnell-9b66758/','  https://www.linkedin.com/in/deirdre-angus-987b533/', ' https://www.linkedin.com/in/davidwatkins29/',
-'https://www.linkedin.com/in/matthew-saxon-aa75245/', 'https://www.linkedin.com/in/laurenmcmillan2015/',' https://www.linkedin.com/in/carrieyuill/','  https://www.linkedin.com/in/karensxiao/', ' https://www.linkedin.com/in/jennifermhall/', 'https://www.linkedin.com/in/jodysimon/', 'https://www.linkedin.com/in/jerrysastri/', 'https://www.linkedin.com/in/ethan-scharf/', 'https://www.linkedin.com/in/valerie-massa-40b16370/',
-'https://www.linkedin.com/in/carmelgalvin/', 'https://www.linkedin.com/in/mackenzie-standish-santos-695b581a/',' https://www.linkedin.com/in/madelinemcasey/',  'https://www.linkedin.com/in/nikmedrano/', ' https://www.linkedin.com/in/nushaettefagh/ ' ,
-'https://www.linkedin.com/in/kathleen-pacini-phr-b115986/', 'https://www.linkedin.com/in/debbielee/',' https://www.linkedin.com/in/samanthagoffredi/ ',' https://www.linkedin.com/in/brittany-doorish-18395a31/', ' https://www.linkedin.com/in/rockmanha/']
-    try:
-        for row in data:
-            row=[row]
-            try:
-                person_info=person_scrape(row[0], driver)
-                # print(person_info)
-                row.extend(person_info)
-                i+=1
-                print(row)
-                new_data.append(row)
-                print('new person', i)
-                # if i>4:
-                #     break
-                if i % 5 == 0:
-                    time.sleep(30)
-                else:
-                    time.sleep(7)
-            except WebDriverException as e:
-                print(e)
-                pass
-            except Exception as e:
-                print(e)
-                pass
-    except KeyboardInterrupt:
+    reader=csv.reader(file)  # Open our file and get ready to read.
+    data=list(reader)  # Read everything inside.
+    
+    # Go through each row in the file.
+    for row in data:
         try:
-            with open('emergency_save_person_data.pickle', 'wb') as file:
-                pickle.dump(new_data, file)
-        except:
+            person_info=person_scrape(row[0], driver)  # Get details for the person in this row.
+            row.extend(person_info)  # Add those details to our current row.
+            i+=1
+            new_data.append(row)  # Add the completed row to our 'new_data' box.
+            print('new person', i)
+            
+            # Sometimes we pause for a bit, either for a short or a longer time.
+            if i % 5 == 0:
+                time.sleep(30)
+            else:
+                time.sleep(7)
+        except WebDriverException as e:  # If our browser has a hiccup, tell us what went wrong.
+            print(e)
             pass
+        except Exception as e:  # If anything else goes wrong, also tell us.
+            print(e)
+            pass
+
+# If we suddenly stop the program, try to save our 'new_data' safely.
+except KeyboardInterrupt:
+    try:
+        with open('emergency_save_person_data.pickle', 'wb') as file:
+            pickle.dump(new_data, file)
+    except:
+        pass
+
+# Save all the details we've gathered.
 try:
     with open('person_data.pickle', 'wb') as file:
         pickle.dump(new_data, file)
 except:
     pass
+
+# Write the new data into a new CSV file.
 try:
     with open('talent_linkedin.csv', 'w', encoding="utf-8", newline='') as file:
         writer=csv.writer(file)
@@ -101,34 +104,11 @@ try:
 except:
     print(new_data)
 
+# Save the original data as a backup.
 try:
     with open('linkedin_consulting_extra_save.csv', 'w', encoding="utf-8", newline='') as file:
         writer=csv.writer(file)
         writer.writerows(data)
         print(data)
 except:
-    print(data)
-
-# person=Person("https://www.linkedin.com/in/amit-kumar-9a216816b", driver=driver, scrape=False)
-# time.sleep(15)
-# person.scrape(close_on_complete=False)
-#
-# name=person.name
-# title=person.job_title
-# now_company=person.company
-# print(name, title, now_company)
-# experience=person.experiences
-# print(experience)
-# current_company=experience[0]
-# print(current_company)
-# link_to_company=current_company.linkedin_url
-# print(link_to_company)
-# location=current_company.location
-# print(location)
-# company=Company(link_to_company, driver=driver)
-# company_name=company.name
-# company_size=company.company_size
-# company_website=company.website
-# about=company.about_us
-# print(company_name, company_size, company_website, about)
-
+    print(data) 
