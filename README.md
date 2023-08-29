@@ -8,7 +8,7 @@ linkedin_scraper library
 webdriver_manager library
 
 Scripts Overview
-Log in to aboid capthca and automating logging in every time
+Log in to avoid capthca and automating logging in every time
 Linkedin_logging_in.py: This script prepares an automated web browser to visit LinkedIn's main page. It's designed to let users interact with the LinkedIn page, possibly to manually login or navigate the site, giving them 5 minutes to do so.
 
 Run
